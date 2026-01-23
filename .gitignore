@@ -55,14 +55,14 @@ obj/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
-install_manifest.txt 
+install_manifest.txt
 compile_commands.json
 
 # Temporary files
-*.tmp 
-*.log 
-*.bak 
-*.swp 
+*.tmp
+*.log
+*.bak
+*.swp
 
 # vcpkg
 vcpkg_installed/
@@ -73,3 +73,5 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+.idea
