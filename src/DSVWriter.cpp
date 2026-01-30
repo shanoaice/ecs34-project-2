@@ -9,6 +9,12 @@ struct CDSVWriter::SImplementation {
   char DDelimiter;
   bool DQuoteAll;
 
+  SImplementation(std::shared_ptr<CDataSink> sink, char delim, bool quoteall) {
+    DSink = sink;
+    DDelimiter = delim;
+    DQuoteAll = quoteall;
+  }
+
   bool WriteRow(const std::vector<std::string> &row) {
     bool first_col = true;
     for (const auto &col : row) {
