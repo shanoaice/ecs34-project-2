@@ -28,8 +28,8 @@ TEST_CFLAGS   := -Wall -Werror -Wpedantic -g -O0 --coverage
 TEST_CXXFLAGS := $(TEST_CFLAGS) -std=c++23
 TEST_LDFLAGS  := -fuse-ld=$(LD) -lgcov -lpthread -lgtest -lgtest_main -lexpat
 
-SOURCES := StringDataSink StringDataSource DSVWriter
-TESTS := StringDataSinkTest StringDataSourceTest DSVTest
+SOURCES := StringUtils StringDataSink StringDataSource DSVWriter
+TESTS := StringUtilsTest StringDataSinkTest StringDataSourceTest DSVTest
 
 .PHONY: all directories test_directories test clean
 
