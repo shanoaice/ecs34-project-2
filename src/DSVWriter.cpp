@@ -1,4 +1,5 @@
 #include "DSVWriter.h"
+#include "DataSink.h"
 #include <memory>
 #include <string>
 #include <vector>
