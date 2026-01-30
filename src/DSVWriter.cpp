@@ -18,7 +18,8 @@ struct CDSVWriter::SImplementation {
 
       if (col.find(DDelimiter) != std::string::npos ||
           col.find("\"") != std::string::npos ||
-          col.find("\n") != std::string::npos) {
+          col.find("\n") != std::string::npos ||
+          DQuoteAll) {
         DSink->Put('"');
         DSink->Write(buf);
         DSink->Put('"');
