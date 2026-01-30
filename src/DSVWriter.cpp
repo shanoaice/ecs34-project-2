@@ -1,4 +1,6 @@
 #include "DSVWriter.h"
+#include <memory>
+#include <string>
 #include <vector>
 
 struct CDSVWriter::SImplementation {
@@ -7,12 +9,12 @@ struct CDSVWriter::SImplementation {
   bool DQuoteAll;
 
   bool WriteRow(const std::vector<std::string> &row) {
-    bool firstCol = true;
+    bool first_col = true;
     for (const auto &col : row) {
-      if (!firstCol) {
+      if (!first_col) {
         DSink->Put(DDelimiter);
       }
-      firstCol = false;
+      first_col = false;
 
       std::vector<char> buf(col.begin(), col.end());
 
@@ -27,6 +29,8 @@ struct CDSVWriter::SImplementation {
         DSink->Write(buf);
       }
     }
+
+    DSink->Put('\n');
 
     return true;
   };
