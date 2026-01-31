@@ -1,6 +1,7 @@
 #include "DSVReader.h"
 #include "DataSource.h"
 #include <memory>
+#include <string>
 
 struct CDSVReader::SImplementation {
   std::shared_ptr<CDataSource> DSource;
@@ -12,18 +13,60 @@ struct CDSVReader::SImplementation {
   }
 
   bool ParseValue(std::string &value) {
-    return false;
+    // if read until the end of the row.
+
+    bool in_quotes = false;
+
+    if (DSource->End()) {
+      return true;
+    }
+
+    while (!DSource->End()) {
+      char ch;
+      DSource->Get(ch);
+
+      if (ch == '"' && !in_quotes) {
+        in_quotes = true;
+        continue;
+      }
+
+      if (ch == '"' && in_quotes) {
+        char next_ch;
+        DSource->Peek(next_ch);
+
+        if (next_ch == DDelimiter) {
+          DSource->Get(next_ch);
+          return false;
+        }
+
+        if (next_ch == '\n' || DSource->End()) {
+          DSource->Get(next_ch);
+          return true;
+        }
+      }
+
+      if (ch == DDelimiter || ch == '\n') {
+        return true;
+      }
+
+      value += ch;
+    }
+
+    return true;
   }
 
   bool ReadRow(std::vector<std::string> &row) {
-    while (!DSource->End()) {}
-    return false;
+    std::string current_val;
+    while (!ParseValue(current_val)) {
+      row.push_back(current_val);
+    }
+
+    return true;
   }
 };
 
 CDSVReader::CDSVReader(std::shared_ptr<CDataSource> source, char delimiter) {
-  DImplementation =
-      std::make_unique<SImplementation>(source, delimiter);
+  DImplementation = std::make_unique<SImplementation>(source, delimiter);
 }
 
 CDSVReader::~CDSVReader() = default;
