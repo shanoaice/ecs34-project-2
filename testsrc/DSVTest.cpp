@@ -1,5 +1,7 @@
+#include "DSVReader.h"
 #include "DSVWriter.h"
 #include "StringDataSink.h"
+#include "StringDataSource.h"
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
@@ -87,3 +89,57 @@ TEST(DSVWriter, DelimQuoted) {
 WithNewline"|"Qux"""WithQuote"
 )");
 }
+
+TEST(DSVReader, Comma) {
+  auto Sink = std::make_shared<CStringDataSink>();
+  CDSVWriter Writer(Sink, ',');
+
+  Writer.WriteRow(row1);
+  Writer.WriteRow(row2);
+  Writer.WriteRow(row3);
+
+  auto Source = std::make_shared<CStringDataSource>(
+      std::string(Sink->String().cbegin(), Sink->String().cend() - 2)); // strip away the final newline
+  CDSVReader Reader(Source, ',');
+
+  std::vector<std::string> read_row1;
+  std::vector<std::string> read_row2;
+  std::vector<std::string> read_row3;
+
+  Reader.ReadRow(read_row1);
+  Reader.ReadRow(read_row2);
+  Reader.ReadRow(read_row3);
+
+  EXPECT_EQ(read_row1, row1);
+  EXPECT_EQ(read_row2, row2);
+  EXPECT_EQ(read_row3, row3);
+}
+
+TEST(DSVReader, CommaQuoted) {
+  auto SinkQuoted = std::make_shared<CStringDataSink>();
+  CDSVWriter Writer(SinkQuoted, ',', true);
+
+  Writer.WriteRow(row1);
+  Writer.WriteRow(row2);
+  Writer.WriteRow(row3);
+
+  auto Source = std::make_shared<CStringDataSource>(
+      std::string(SinkQuoted->String().cbegin(), SinkQuoted->String().cend() - 2)); // strip away the final newline
+  CDSVReader Reader(Source, ',');
+
+  std::vector<std::string> read_row1;
+  std::vector<std::string> read_row2;
+  std::vector<std::string> read_row3;
+
+  Reader.ReadRow(read_row1);
+  Reader.ReadRow(read_row2);
+  Reader.ReadRow(read_row3);
+
+  EXPECT_EQ(read_row1, row1);
+  EXPECT_EQ(read_row2, row2);
+  EXPECT_EQ(read_row3, row3);
+}
+
+// TEST(DSVReader, Delim){
+
+//}
