@@ -140,6 +140,53 @@ TEST(DSVReader, CommaQuoted) {
   EXPECT_EQ(read_row3, row3);
 }
 
-// TEST(DSVReader, Delim){
 
-//}
+TEST(DSVReader, Delim){
+  auto SinkDelim = std::make_shared<CStringDataSink>();
+  CDSVWriter Writer(SinkDelim, '|');
+
+  Writer.WriteRow(row1);
+  Writer.WriteRow(row2);
+  Writer.WriteRow(row3);
+
+  auto Source = std::make_shared<CStringDataSource>(
+      std::string(SinkDelim->String().cbegin(), SinkDelim->String().cend() - 2)); // strip away the final newline
+  CDSVReader Reader(Source, '|');
+
+  std::vector<std::string> read_row1;
+  std::vector<std::string> read_row2;
+  std::vector<std::string> read_row3;
+
+  Reader.ReadRow(read_row1);
+  Reader.ReadRow(read_row2);
+  Reader.ReadRow(read_row3);
+
+  EXPECT_EQ(read_row1, row1);
+  EXPECT_EQ(read_row2, row2);
+  EXPECT_EQ(read_row3, row3);
+}
+
+TEST(DSVReader, DelimQuoted){
+  auto SinkDelimQuoted = std::make_shared<CStringDataSink>();
+  CDSVWriter Writer(SinkDelimQuoted, '|', true);
+
+  Writer.WriteRow(row1);
+  Writer.WriteRow(row2);
+  Writer.WriteRow(row3);
+
+  auto Source = std::make_shared<CStringDataSource>(
+      std::string(SinkDelimQuoted->String().cbegin(), SinkDelimQuoted->String().cend() - 2)); // strip away the final newline
+  CDSVReader Reader(Source, '|');
+
+  std::vector<std::string> read_row1;
+  std::vector<std::string> read_row2;
+  std::vector<std::string> read_row3;
+
+  Reader.ReadRow(read_row1);
+  Reader.ReadRow(read_row2);
+  Reader.ReadRow(read_row3);
+
+  EXPECT_EQ(read_row1, row1);
+  EXPECT_EQ(read_row2, row2);
+  EXPECT_EQ(read_row3, row3);
+}
