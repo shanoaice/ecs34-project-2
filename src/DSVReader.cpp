@@ -17,10 +17,6 @@ struct CDSVReader::SImplementation {
 
     bool in_quotes = false;
 
-    if (DSource->End()) {
-      return true;
-    }
-
     while (!DSource->End()) {
       char ch;
       DSource->Get(ch);
@@ -45,7 +41,11 @@ struct CDSVReader::SImplementation {
         }
       }
 
-      if (ch == DDelimiter || ch == '\n') {
+      if (ch == DDelimiter && !in_quotes) {
+        return false;
+      }
+
+      if (ch == '\n' && !in_quotes) {
         return true;
       }
 
@@ -59,7 +59,9 @@ struct CDSVReader::SImplementation {
     std::string current_val;
     while (!ParseValue(current_val)) {
       row.push_back(current_val);
+      current_val.clear();
     }
+    row.push_back(current_val);
 
     return true;
   }
