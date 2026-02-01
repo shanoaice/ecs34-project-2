@@ -1,5 +1,6 @@
 #include "StringUtils.h"
 #include <ranges>
+#include <string>
 #include <string_view>
 
 using std::string;
@@ -72,11 +73,14 @@ std::string RJust(const std::string &str, int width, char fill) noexcept {
 
 std::string Replace(const std::string &str, const std::string &old,
                     const std::string &rep) noexcept {
+  if (old.empty()) {
+    return string(str);
+  }
   string newstr(str);
-  auto idx = newstr.find(old);
-  while (idx != string::npos) {
-    newstr.replace(idx, old.length(), rep);
-    idx = newstr.find(old);
+  string::size_type pos = 0;
+  while ((pos = newstr.find(old, pos)) != string::npos) {
+    newstr.replace(pos, old.length(), rep);
+    pos += rep.length();
   }
   return newstr;
 }
