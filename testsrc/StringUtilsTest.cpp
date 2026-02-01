@@ -66,6 +66,7 @@ TEST(StringUtilsTest, RJust) {
 TEST(StringUtilsTest, Replace) {
   EXPECT_EQ(StringUtils::Replace("oldreplace", "old", "new"), "newreplace");
   EXPECT_EQ(StringUtils::Replace("oldreplace", "new", "old"), "oldreplace");
+  EXPECT_EQ(StringUtils::Replace("oldreplace", "", "old"), "oldreplace");
 }
 
 TEST(StringUtilsTest, Split) {
