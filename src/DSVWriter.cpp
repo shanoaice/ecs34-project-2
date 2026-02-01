@@ -1,5 +1,6 @@
 #include "DSVWriter.h"
 #include "DataSink.h"
+#include "StringUtils.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -23,17 +24,19 @@ struct CDSVWriter::SImplementation {
       }
       first_col = false;
 
-      std::vector<char> buf(col.begin(), col.end());
-
       if (col.find(DDelimiter) != std::string::npos ||
-          col.find("\"") != std::string::npos ||
           col.find("\n") != std::string::npos ||
           DQuoteAll) {
         DSink->Put('"');
-        DSink->Write(buf);
+        DSink->Write(std::vector<char>(col.cbegin(), col.cend()));
+        DSink->Put('"');
+      } if (col.find("\"") != std::string::npos) {
+        auto escaped = StringUtils::Replace(col, "\"", "\"\"");
+        DSink->Put('"');
+        DSink->Write(std::vector<char>(escaped.begin(), escaped.end()));
         DSink->Put('"');
       } else {
-        DSink->Write(buf);
+        DSink->Write(std::vector<char>(col.cbegin(), col.cend()));
       }
     }
 
