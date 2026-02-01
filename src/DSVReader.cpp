@@ -39,6 +39,10 @@ struct CDSVReader::SImplementation {
           DSource->Get(next_ch);
           return true;
         }
+
+        if (next_ch == '"') {
+          DSource->Get(ch);
+        }
       }
 
       if (ch == DDelimiter && !in_quotes) {
