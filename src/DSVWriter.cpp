@@ -24,19 +24,23 @@ struct CDSVWriter::SImplementation {
       }
       first_col = false;
 
-      if (col.find(DDelimiter) != std::string::npos ||
-          col.find("\n") != std::string::npos || DQuoteAll) {
-        DSink->Put('"');
-        DSink->Write(std::vector<char>(col.cbegin(), col.cend()));
-        DSink->Put('"');
-      }
+      std::vector<char> buf;
+
       if (col.find("\"") != std::string::npos) {
         auto escaped = StringUtils::Replace(col, "\"", "\"\"");
+        buf.assign(escaped.cbegin(), escaped.cend());
+      } else {
+        buf.assign(col.cbegin(), col.cend());
+      }
+
+      if (col.find(DDelimiter) != std::string::npos ||
+          col.find("\n") != std::string::npos ||
+          col.find("\"") != std::string::npos || DQuoteAll) {
         DSink->Put('"');
-        DSink->Write(std::vector<char>(escaped.begin(), escaped.end()));
+        DSink->Write(buf);
         DSink->Put('"');
       } else {
-        DSink->Write(std::vector<char>(col.cbegin(), col.cend()));
+        DSink->Write(buf);
       }
     }
 
