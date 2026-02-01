@@ -25,12 +25,12 @@ struct CDSVWriter::SImplementation {
       first_col = false;
 
       if (col.find(DDelimiter) != std::string::npos ||
-          col.find("\n") != std::string::npos ||
-          DQuoteAll) {
+          col.find("\n") != std::string::npos || DQuoteAll) {
         DSink->Put('"');
         DSink->Write(std::vector<char>(col.cbegin(), col.cend()));
         DSink->Put('"');
-      } if (col.find("\"") != std::string::npos) {
+      }
+      if (col.find("\"") != std::string::npos) {
         auto escaped = StringUtils::Replace(col, "\"", "\"\"");
         DSink->Put('"');
         DSink->Write(std::vector<char>(escaped.begin(), escaped.end()));
@@ -48,8 +48,8 @@ struct CDSVWriter::SImplementation {
 
 CDSVWriter::CDSVWriter(std::shared_ptr<CDataSink> sink, char delimiter,
                        bool quoteall) {
-  DImplementation =
-      std::make_unique<SImplementation>(sink, delimiter, quoteall);
+  DImplementation = std::make_unique<SImplementation>(
+      sink, delimiter == '"' ? ',' : delimiter, quoteall);
 }
 
 CDSVWriter::~CDSVWriter() = default;
