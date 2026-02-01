@@ -9,7 +9,7 @@
 
 std::vector<std::string> row1 = {"Hello", "World"};
 std::vector<std::string> row2 = {"Foo|WithDelim", "Bar,WithComma"};
-std::vector<std::string> row3 = {"Baz\nWithNewline", R"(Qux"""WithQuote)"};
+std::vector<std::string> row3 = {"Baz\nWithNewline", R"(Qux"WithQuote)"};
 
 TEST(DSVWriter, Comma) {
   auto Sink = std::make_shared<CStringDataSink>();
@@ -27,7 +27,7 @@ Foo|WithDelim,"Bar,WithComma"
   EXPECT_EQ(Sink->String(), R"(Hello,World
 Foo|WithDelim,"Bar,WithComma"
 "Baz
-WithNewline","Qux"""WithQuote"
+WithNewline","Qux""WithQuote"
 )");
 }
 
@@ -47,7 +47,7 @@ TEST(DSVWriter, CommaQuoted) {
   EXPECT_EQ(SinkQuoted->String(), R"("Hello","World"
 "Foo|WithDelim","Bar,WithComma"
 "Baz
-WithNewline","Qux"""WithQuote"
+WithNewline","Qux""WithQuote"
 )");
 }
 
@@ -66,7 +66,7 @@ TEST(DSVWriter, Delim) {
   EXPECT_EQ(SinkDelim->String(), R"(Hello|World
 "Foo|WithDelim"|Bar,WithComma
 "Baz
-WithNewline"|"Qux"""WithQuote"
+WithNewline"|"Qux""WithQuote"
 )");
 }
 
@@ -86,7 +86,7 @@ TEST(DSVWriter, DelimQuoted) {
   EXPECT_EQ(SinkDelimQuoted->String(), R"("Hello"|"World"
 "Foo|WithDelim"|"Bar,WithComma"
 "Baz
-WithNewline"|"Qux"""WithQuote"
+WithNewline"|"Qux""WithQuote"
 )");
 }
 
