@@ -9,10 +9,13 @@ struct CXMLReader::SImplementation{
     XML_Parser DParser;
     std::queue<SXMLEntity> DQueue;
 
+    bool DDone = false;
+    bool DParseError = false;
+
     static void StartElementHandler(void *userData, const XML_Char *name, const XML_Char **atts){
         SImplementation *This = (SImplementation *)userData;
         SXMLEntity NewEntity;
-        
+
         NewEntity.DType = SXMLEntity::EType::StartElement;
         NewEntity.DNameData = name;
         for(int i = 0; atts[i]; i += 2){
@@ -24,7 +27,7 @@ struct CXMLReader::SImplementation{
     static void EndElementHandler(void *userData, const XML_Char *name){
         SImplementation *This = (SImplementation *)userData;
         SXMLEntity NewEntity;
-        
+
         NewEntity.DType = SXMLEntity::EType::EndElement;
         NewEntity.DNameData = name;
         This->DQueue.push(NewEntity);
@@ -33,7 +36,7 @@ struct CXMLReader::SImplementation{
     static void CharacterDataHandler(void *userData, const XML_Char *s, int len){
         SImplementation *This = (SImplementation *)userData;
         SXMLEntity NewEntity;
-        
+
         NewEntity.DType = SXMLEntity::EType::CharData;
         NewEntity.DNameData = std::string(s,len);
         This->DQueue.push(NewEntity);
@@ -42,28 +45,83 @@ struct CXMLReader::SImplementation{
     SImplementation(std::shared_ptr< CDataSource > src){
         DSource = src;
         DParser = XML_ParserCreate(nullptr);
+
         XML_SetUserData(DParser,(void *)this);
         XML_SetStartElementHandler(DParser,StartElementHandler);
         XML_SetEndElementHandler(DParser,EndElementHandler);
         XML_SetCharacterDataHandler(DParser,CharacterDataHandler);
+    }
 
+    ~SImplementation(){
+        XML_ParserFree(DParser);
     }
 
     bool End() const{
+        return DDone && DQueue.empty();
+    }
+
+    bool OneTimePump(){
+        if(DDone || DParseError){
+            return false;
+        }
+
+        std::vector<char> Buffer(512);
+        DSource->Read(Buffer, Buffer.size());
+
+        const bool IsFinal = DSource->End();
+
+        const int Len = static_cast<int>(Buffer.size());
+        const int Status = XML_Parse(
+            DParser,
+            Buffer.empty() ? "" : Buffer.data(),
+            Len,
+            IsFinal ? 1 : 0
+        );
+
+        if(Status == XML_STATUS_ERROR){
+            DParseError = true;
+            return false;
+        }
+
+        if(IsFinal){
+            DDone = true;
+        }
         return true;
     }
 
     bool ReadEntity(SXMLEntity &entity, bool skipcdata){
+        while(true){
 
-        if(DQueue.empty()){
-            std::vector<char> Buffer(512);
-            DSource->Read(Buffer,Buffer.size());
-            XML_Parse(DParser,Buffer.data(),Buffer.size(),DSource->End());
-        }
-        if(!DQueue.empty()){
-            entity = DQueue.front();
-            DQueue.pop();
-            return true;
+            if(skipcdata){
+                while(!DQueue.empty() && DQueue.front().DType == SXMLEntity::EType::CharData){
+                    DQueue.pop();
+                }
+            }
+
+            if(DQueue.empty()){
+                std::vector<char> Buffer(512);
+                DSource->Read(Buffer,Buffer.size());
+                XML_Parse(DParser,Buffer.data(),Buffer.size(),DSource->End());
+            }
+
+            if(!DQueue.empty()){
+                entity = DQueue.front();
+                DQueue.pop();
+                return true;
+            }
+
+            if(End() || DParseError){
+                return false;
+            }
+
+            if(!OneTimePump()){
+                if(End()){
+                    return false;
+                }
+                if(DParseError){
+                    return false;
+                }
+            }
         }
 
         return false;
@@ -71,7 +129,7 @@ struct CXMLReader::SImplementation{
 
 };
 
-        
+
 
 CXMLReader::CXMLReader(std::shared_ptr< CDataSource > src){
     DImplementation = std::make_unique<SImplementation>(src);
