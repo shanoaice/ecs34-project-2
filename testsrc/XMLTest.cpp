@@ -3,7 +3,7 @@
 #include "XMLEntity.h"
 #include "XMLReader.h"
 #include "XMLWriter.h"
-//#include <algorithm>
+// #include <algorithm>
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
@@ -366,7 +366,7 @@ TEST(XMLReader, ReferenceSkipcdata) {
   // means no mismatch
 }
 
-TEST(XMLWriter, Reference) {
+TEST(XMLWriter, WholeDocument) {
   auto Sink = std::make_shared<CStringDataSink>();
   CXMLWriter Writer(Sink);
 
@@ -387,4 +387,53 @@ TEST(XMLWriter, Reference) {
   EXPECT_EQ(entities.size(), reference_reader.size());
 
   EXPECT_EQ(entities, reference_reader);
+}
+
+TEST(XMLWriter, FlushTags) {
+  auto Sink = std::make_shared<CStringDataSink>();
+  CXMLWriter Writer(Sink);
+
+  SXMLEntity entity_begin = {
+      .DType = SXMLEntity::EType::StartElement,
+      .DNameData = "entity",
+      .DAttributes = {},
+  };
+
+  SXMLEntity entity_attributes_begin = {
+      .DType = SXMLEntity::EType::StartElement,
+      .DNameData = "entity_attributes",
+      .DAttributes = {{"tag", "attributes"}},
+  };
+
+  SXMLEntity entity_end = {
+      .DType = SXMLEntity::EType::EndElement,
+      .DNameData = "entity",
+      .DAttributes = {},
+  };
+
+  SXMLEntity entity_attributes_end = {
+      .DType = SXMLEntity::EType::EndElement,
+      .DNameData = "entity_attributes",
+      .DAttributes = {},
+  };
+
+  std::vector reference_output = {entity_begin, entity_attributes_begin,
+                                  entity_attributes_end, entity_end};
+
+  Writer.WriteEntity(entity_begin);
+  Writer.WriteEntity(entity_attributes_begin);
+  Writer.Flush();
+
+  auto Source = std::make_shared<CStringDataSource>(Sink->String());
+  CXMLReader Reader(Source);
+
+  std::vector<SXMLEntity> entities;
+  while (!Reader.End()) {
+    SXMLEntity entity;
+    Reader.ReadEntity(entity);
+    entities.push_back(entity);
+  }
+
+  EXPECT_EQ(reference_output.size(), entities.size());
+  EXPECT_EQ(reference_output, entities);
 }
