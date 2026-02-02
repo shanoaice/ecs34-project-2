@@ -3,12 +3,12 @@
 #include "XMLEntity.h"
 #include <expat.h>
 
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
-struct CXMLWriter::SImplementation{
+struct CXMLWriter::SImplementation {
     std::shared_ptr<CDataSink> DSink;
     std::vector<std::string> DOpenStack;
 
@@ -35,7 +35,7 @@ struct CXMLWriter::SImplementation{
         return DSink->Write(buf);
     }
 
-    bool Flush(){
+    bool Flush() {
         // complete all non-closed tags by LIFO order
         while (!DOpenStack.empty()) {
             std::string name = DOpenStack.back();
@@ -45,7 +45,8 @@ struct CXMLWriter::SImplementation{
             out += name;
             out += ">";
 
-            if (!WriteRaw(out)) return false;
+            if (!WriteRaw(out))
+                return false;
         }
         return true;
     }
@@ -62,60 +63,60 @@ struct CXMLWriter::SImplementation{
         return out;
     }
 
-    bool WriteEntity(const SXMLEntity &entity){
+    bool WriteEntity(const SXMLEntity &entity) {
         using EType = SXMLEntity::EType;
 
         switch (entity.DType) {
-            case EType::StartElement: {
-                if (entity.DNameData.empty()) {
-                    return false;
-                }
-
-                std::string out = "<";
-                out += entity.DNameData;
-                out += BuildTagCore(entity.DAttributes);
-                out += ">";
-
-                if (!WriteRaw(out)) return false;
-                DOpenStack.push_back(entity.DNameData);
-                return true;
+        case EType::StartElement: {
+            if (entity.DNameData.empty()) {
+                return false;
             }
-            case EType::EndElement: {
-                if (entity.DNameData.empty()) {
-                    return false;
-                }
 
-                if (DOpenStack.back() != entity.DNameData) { // 标签不匹配
-                    return false;
-                }
+            std::string out = "<";
+            out += entity.DNameData;
+            out += BuildTagCore(entity.DAttributes);
+            out += ">";
 
-
-                DOpenStack.pop_back();
-
-                std::string out = "</";
-                out += entity.DNameData;
-                out += ">";
-
-                return WriteRaw(out);
+            if (!WriteRaw(out))
+                return false;
+            DOpenStack.push_back(entity.DNameData);
+            return true;
+        }
+        case EType::EndElement: {
+            if (entity.DNameData.empty()) {
+                return false;
             }
-            case EType::CharData: {
-                return WriteRaw(EscapeText(entity.DNameData));
-            }
-            case EType::CompleteElement: {
-                if (entity.DNameData.empty()) return false;
 
-                std::string out = "<";
-                out += entity.DNameData;
-                out += BuildTagCore(entity.DAttributes);
-                out += "/>";
-
-                return WriteRaw(out);
+            if (DOpenStack.back() != entity.DNameData) { // 标签不匹配
+                return false;
             }
+
+            DOpenStack.pop_back();
+
+            std::string out = "</";
+            out += entity.DNameData;
+            out += ">";
+
+            return WriteRaw(out);
+        }
+        case EType::CharData: {
+            return WriteRaw(EscapeText(entity.DNameData));
+        }
+        case EType::CompleteElement: {
+            if (entity.DNameData.empty())
+                return false;
+
+            std::string out = "<";
+            out += entity.DNameData;
+            out += BuildTagCore(entity.DAttributes);
+            out += "/>";
+
+            return WriteRaw(out);
+        }
         }
 
         return false;
     }
-
 };
 
 CXMLWriter::CXMLWriter(std::shared_ptr<CDataSink> sink) {
@@ -124,9 +125,7 @@ CXMLWriter::CXMLWriter(std::shared_ptr<CDataSink> sink) {
 
 CXMLWriter::~CXMLWriter() = default;
 
-bool CXMLWriter::Flush() {
-    return DImplementation->Flush();
-}
+bool CXMLWriter::Flush() { return DImplementation->Flush(); }
 
 bool CXMLWriter::WriteEntity(const SXMLEntity &entity) {
     return DImplementation->WriteEntity(entity);

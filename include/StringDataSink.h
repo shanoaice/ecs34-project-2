@@ -4,14 +4,15 @@
 #include "DataSink.h"
 #include <string>
 
-class CStringDataSink : public CDataSink{
-    private:
-        std::string DString;
-    public:
-        const std::string &String() const;
+class CStringDataSink : public CDataSink {
+  private:
+    std::string DString;
 
-        bool Put(const char &ch) noexcept override;
-        bool Write(const std::vector<char> &buf) noexcept override;
+  public:
+    const std::string &String() const;
+
+    bool Put(const char &ch) noexcept override;
+    bool Write(const std::vector<char> &buf) noexcept override;
 };
 
 #endif

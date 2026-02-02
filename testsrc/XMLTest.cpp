@@ -321,170 +321,170 @@ std::vector<SXMLEntity> reference_skipcdata = {
 };
 
 TEST(XMLReader, Reference) {
-  auto Source = std::make_shared<CStringDataSource>(reference_xml);
+    auto Source = std::make_shared<CStringDataSource>(reference_xml);
 
-  CXMLReader Reader(Source);
+    CXMLReader Reader(Source);
 
-  std::vector<SXMLEntity> entities;
-  SXMLEntity entity;
-  while (Reader.ReadEntity(entity)) {
-    entities.push_back(entity);
-  }
+    std::vector<SXMLEntity> entities;
+    SXMLEntity entity;
+    while (Reader.ReadEntity(entity)) {
+        entities.push_back(entity);
+    }
 
-  EXPECT_EQ(entities.size(), reference_reader.size());
+    EXPECT_EQ(entities.size(), reference_reader.size());
 
-  EXPECT_EQ(entities, reference_reader);
+    EXPECT_EQ(entities, reference_reader);
 
-  // auto mismatch_from_reference = std::ranges::mismatch(entities,
-  // reference_reader);
+    // auto mismatch_from_reference = std::ranges::mismatch(entities,
+    // reference_reader);
 
-  // EXPECT_EQ(mismatch_from_reference.in1, entities.end()); // basically this
-  // means no mismatch
+    // EXPECT_EQ(mismatch_from_reference.in1, entities.end()); // basically this
+    // means no mismatch
 }
 
 TEST(XMLReader, ReferenceSkipcdata) {
-  auto Source = std::make_shared<CStringDataSource>(reference_xml);
+    auto Source = std::make_shared<CStringDataSource>(reference_xml);
 
-  CXMLReader Reader(Source);
+    CXMLReader Reader(Source);
 
-  std::vector<SXMLEntity> entities;
-  SXMLEntity entity;
-  while (Reader.ReadEntity(entity)) {
-    entities.push_back(entity);
-  }
+    std::vector<SXMLEntity> entities;
+    SXMLEntity entity;
+    while (Reader.ReadEntity(entity)) {
+        entities.push_back(entity);
+    }
 
-  EXPECT_EQ(entities.size(), reference_skipcdata.size());
+    EXPECT_EQ(entities.size(), reference_skipcdata.size());
 
-  EXPECT_EQ(entities, reference_skipcdata);
+    EXPECT_EQ(entities, reference_skipcdata);
 
-  // auto mismatch_from_reference = std::ranges::mismatch(entities,
-  // reference_reader);
+    // auto mismatch_from_reference = std::ranges::mismatch(entities,
+    // reference_reader);
 
-  // EXPECT_EQ(mismatch_from_reference.in1, entities.end()); // basically this
-  // means no mismatch
+    // EXPECT_EQ(mismatch_from_reference.in1, entities.end()); // basically this
+    // means no mismatch
 }
 
 TEST(XMLWriter, WholeDocument) {
-  auto Sink = std::make_shared<CStringDataSink>();
-  CXMLWriter Writer(Sink);
+    auto Sink = std::make_shared<CStringDataSink>();
+    CXMLWriter Writer(Sink);
 
-  for (const auto &entity : reference) {
-    Writer.WriteEntity(entity);
-  }
+    for (const auto &entity : reference) {
+        Writer.WriteEntity(entity);
+    }
 
-  auto Source = std::make_shared<CStringDataSource>(Sink->String());
-  CXMLReader Reader(Source);
+    auto Source = std::make_shared<CStringDataSource>(Sink->String());
+    CXMLReader Reader(Source);
 
-  std::vector<SXMLEntity> entities;
-  SXMLEntity entity;
-  while (Reader.ReadEntity(entity)) {
-    entities.push_back(entity);
-  }
+    std::vector<SXMLEntity> entities;
+    SXMLEntity entity;
+    while (Reader.ReadEntity(entity)) {
+        entities.push_back(entity);
+    }
 
-  EXPECT_EQ(entities.size(), reference_reader.size());
+    EXPECT_EQ(entities.size(), reference_reader.size());
 
-  EXPECT_EQ(entities, reference_reader);
+    EXPECT_EQ(entities, reference_reader);
 }
 
 TEST(XMLWriter, FlushTags) {
-  auto Sink = std::make_shared<CStringDataSink>();
-  CXMLWriter Writer(Sink);
+    auto Sink = std::make_shared<CStringDataSink>();
+    CXMLWriter Writer(Sink);
 
-  SXMLEntity entity_begin = {
-      .DType = SXMLEntity::EType::StartElement,
-      .DNameData = "entity",
-      .DAttributes = {},
-  };
+    SXMLEntity entity_begin = {
+        .DType = SXMLEntity::EType::StartElement,
+        .DNameData = "entity",
+        .DAttributes = {},
+    };
 
-  SXMLEntity entity_attributes_begin = {
-      .DType = SXMLEntity::EType::StartElement,
-      .DNameData = "entity_attributes",
-      .DAttributes = {{"tag", "attributes"}},
-  };
+    SXMLEntity entity_attributes_begin = {
+        .DType = SXMLEntity::EType::StartElement,
+        .DNameData = "entity_attributes",
+        .DAttributes = {{"tag", "attributes"}},
+    };
 
-  SXMLEntity entity_end = {
-      .DType = SXMLEntity::EType::EndElement,
-      .DNameData = "entity",
-      .DAttributes = {},
-  };
+    SXMLEntity entity_end = {
+        .DType = SXMLEntity::EType::EndElement,
+        .DNameData = "entity",
+        .DAttributes = {},
+    };
 
-  SXMLEntity entity_attributes_end = {
-      .DType = SXMLEntity::EType::EndElement,
-      .DNameData = "entity_attributes",
-      .DAttributes = {},
-  };
+    SXMLEntity entity_attributes_end = {
+        .DType = SXMLEntity::EType::EndElement,
+        .DNameData = "entity_attributes",
+        .DAttributes = {},
+    };
 
-  std::vector reference_output = {entity_begin, entity_attributes_begin,
-                                  entity_attributes_end, entity_end};
+    std::vector reference_output = {entity_begin, entity_attributes_begin,
+                                    entity_attributes_end, entity_end};
 
-  Writer.WriteEntity(entity_begin);
-  Writer.WriteEntity(entity_attributes_begin);
-  Writer.Flush();
+    Writer.WriteEntity(entity_begin);
+    Writer.WriteEntity(entity_attributes_begin);
+    Writer.Flush();
 
-  auto Source = std::make_shared<CStringDataSource>(Sink->String());
-  CXMLReader Reader(Source);
+    auto Source = std::make_shared<CStringDataSource>(Sink->String());
+    CXMLReader Reader(Source);
 
-  std::vector<SXMLEntity> entities;
-  SXMLEntity entity;
-  while (Reader.ReadEntity(entity)) {
-    entities.push_back(entity);
-  }
+    std::vector<SXMLEntity> entities;
+    SXMLEntity entity;
+    while (Reader.ReadEntity(entity)) {
+        entities.push_back(entity);
+    }
 
-  EXPECT_EQ(reference_output.size(), entities.size());
-  EXPECT_EQ(reference_output, entities);
+    EXPECT_EQ(reference_output.size(), entities.size());
+    EXPECT_EQ(reference_output, entities);
 }
 
 TEST(XMLWriter, RejectMalformedEntities) {
-  auto Sink = std::make_shared<CStringDataSink>();
-  CXMLWriter Writer(Sink);
+    auto Sink = std::make_shared<CStringDataSink>();
+    CXMLWriter Writer(Sink);
 
-  SXMLEntity malformed_begin_entity = {
-      .DType = SXMLEntity::EType::StartElement,
-      .DNameData = "",
-      .DAttributes = {},
-  };
+    SXMLEntity malformed_begin_entity = {
+        .DType = SXMLEntity::EType::StartElement,
+        .DNameData = "",
+        .DAttributes = {},
+    };
 
-  SXMLEntity malformed_end_entity = {
-      .DType = SXMLEntity::EType::EndElement,
-      .DNameData = "",
-      .DAttributes = {},
-  };
+    SXMLEntity malformed_end_entity = {
+        .DType = SXMLEntity::EType::EndElement,
+        .DNameData = "",
+        .DAttributes = {},
+    };
 
-  SXMLEntity malformed_complete_entity = {
-      .DType = SXMLEntity::EType::CompleteElement,
-      .DNameData = "",
-      .DAttributes = {},
-  };
+    SXMLEntity malformed_complete_entity = {
+        .DType = SXMLEntity::EType::CompleteElement,
+        .DNameData = "",
+        .DAttributes = {},
+    };
 
-  SXMLEntity malformed_entity_type = {
-      .DType = (SXMLEntity::EType)4,
-      .DNameData = "malformed",
-      .DAttributes = {},
-  };
+    SXMLEntity malformed_entity_type = {
+        .DType = (SXMLEntity::EType)4,
+        .DNameData = "malformed",
+        .DAttributes = {},
+    };
 
-  EXPECT_FALSE(Writer.WriteEntity(malformed_begin_entity));
-  EXPECT_FALSE(Writer.WriteEntity(malformed_end_entity));
-  EXPECT_FALSE(Writer.WriteEntity(malformed_complete_entity));
-  EXPECT_FALSE(Writer.WriteEntity(malformed_entity_type));
+    EXPECT_FALSE(Writer.WriteEntity(malformed_begin_entity));
+    EXPECT_FALSE(Writer.WriteEntity(malformed_end_entity));
+    EXPECT_FALSE(Writer.WriteEntity(malformed_complete_entity));
+    EXPECT_FALSE(Writer.WriteEntity(malformed_entity_type));
 }
 
 TEST(XMLWriter, RejectMismatchedTags) {
-  auto Sink = std::make_shared<CStringDataSink>();
-  CXMLWriter Writer(Sink);
+    auto Sink = std::make_shared<CStringDataSink>();
+    CXMLWriter Writer(Sink);
 
-  SXMLEntity mismatched_begin_entity = {
-      .DType = SXMLEntity::EType::StartElement,
-      .DNameData = "mismatched",
-      .DAttributes = {},
-  };
+    SXMLEntity mismatched_begin_entity = {
+        .DType = SXMLEntity::EType::StartElement,
+        .DNameData = "mismatched",
+        .DAttributes = {},
+    };
 
-  SXMLEntity mismatched_end_entity = {
-      .DType = SXMLEntity::EType::EndElement,
-      .DNameData = "mismatch",
-      .DAttributes = {},
-  };
+    SXMLEntity mismatched_end_entity = {
+        .DType = SXMLEntity::EType::EndElement,
+        .DNameData = "mismatch",
+        .DAttributes = {},
+    };
 
-  Writer.WriteEntity(mismatched_begin_entity);
+    Writer.WriteEntity(mismatched_begin_entity);
 
-  EXPECT_FALSE(Writer.WriteEntity(mismatched_end_entity));
+    EXPECT_FALSE(Writer.WriteEntity(mismatched_end_entity));
 }
