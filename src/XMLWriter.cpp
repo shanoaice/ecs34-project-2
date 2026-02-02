@@ -36,7 +36,7 @@ struct CXMLWriter::SImplementation{
     }
 
     bool Flush(){
-        // 没 close 的 tag 全部补齐 LIFO
+        // complete all non-closed tags by LIFO order
         while (!DOpenStack.empty()) {
             std::string name = DOpenStack.back();
             DOpenStack.pop_back();
