@@ -98,12 +98,6 @@ struct CXMLReader::SImplementation{
                 }
             }
 
-            if(DQueue.empty()){
-                std::vector<char> Buffer(512);
-                DSource->Read(Buffer,Buffer.size());
-                XML_Parse(DParser,Buffer.data(),Buffer.size(),DSource->End());
-            }
-
             if(!DQueue.empty()){
                 entity = DQueue.front();
                 DQueue.pop();
@@ -115,12 +109,7 @@ struct CXMLReader::SImplementation{
             }
 
             if(!OneTimePump()){
-                if(End()){
                     return false;
-                }
-                if(DParseError){
-                    return false;
-                }
             }
         }
 
