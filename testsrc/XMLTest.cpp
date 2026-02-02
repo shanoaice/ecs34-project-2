@@ -349,7 +349,7 @@ TEST(XMLReader, ReferenceSkipcdata) {
 
     std::vector<SXMLEntity> entities;
     SXMLEntity entity;
-    while (Reader.ReadEntity(entity)) {
+    while (Reader.ReadEntity(entity, true)) {
         entities.push_back(entity);
     }
 
