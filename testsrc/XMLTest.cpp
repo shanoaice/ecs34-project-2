@@ -463,7 +463,14 @@ TEST(XMLWriter, RejectMalformedEntities) {
       .DAttributes = {},
   };
 
+  SXMLEntity malformed_entity_type = {
+      .DType = (SXMLEntity::EType) 4,
+      .DNameData = "malformed",
+      .DAttributes = {},
+  };
+
   EXPECT_FALSE(Writer.WriteEntity(malformed_begin_entity));
   EXPECT_FALSE(Writer.WriteEntity(malformed_end_entity));
   EXPECT_FALSE(Writer.WriteEntity(malformed_complete_entity));
+  EXPECT_FALSE(Writer.WriteEntity(malformed_entity_type));
 }
