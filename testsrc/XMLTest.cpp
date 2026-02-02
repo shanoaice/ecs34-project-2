@@ -384,6 +384,9 @@ TEST(XMLWriter, WholeDocument) {
     entities.push_back(entity);
   }
 
+  SXMLEntity entity;
+  EXPECT_FALSE(Reader.ReadEntity(entity));
+
   EXPECT_EQ(entities.size(), reference_reader.size());
 
   EXPECT_EQ(entities, reference_reader);
@@ -436,4 +439,31 @@ TEST(XMLWriter, FlushTags) {
 
   EXPECT_EQ(reference_output.size(), entities.size());
   EXPECT_EQ(reference_output, entities);
+}
+
+TEST(XMLWriter, RejectMalformedEntities) {
+  auto Sink = std::make_shared<CStringDataSink>();
+  CXMLWriter Writer(Sink);
+
+  SXMLEntity malformed_begin_entity = {
+      .DType = SXMLEntity::EType::StartElement,
+      .DNameData = "",
+      .DAttributes = {},
+  };
+
+  SXMLEntity malformed_end_entity = {
+      .DType = SXMLEntity::EType::EndElement,
+      .DNameData = "",
+      .DAttributes = {},
+  };
+
+  SXMLEntity malformed_complete_entity = {
+      .DType = SXMLEntity::EType::CompleteElement,
+      .DNameData = "",
+      .DAttributes = {},
+  };
+
+  EXPECT_FALSE(Writer.WriteEntity(malformed_begin_entity));
+  EXPECT_FALSE(Writer.WriteEntity(malformed_end_entity));
+  EXPECT_FALSE(Writer.WriteEntity(malformed_complete_entity));
 }
