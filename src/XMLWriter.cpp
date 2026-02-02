@@ -7,7 +7,6 @@
 #include <vector>
 #include <memory>
 #include <utility>
-#include <type_traits>
 
 struct CXMLWriter::SImplementation{
     std::shared_ptr<CDataSink> DSink;
