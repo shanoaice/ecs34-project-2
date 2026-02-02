@@ -28,6 +28,25 @@ std::string reference_xml =
 </root>
 )";
 
+std::string malformed_xml =
+    R"(<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <element attribute="value">Content goes here</element>
+    <special_characters>
+        <less_than>&lt;</less_than>
+        <greater_than>&gt;</greater_than>
+        <ampe&rsand tag="&amp;">&amp;</ampersand>
+        <apostrophe tag="&apos;">'</apostrophe>
+        <quote tag="&quot;">"</quote>
+    </special_characters>
+    <nested_structure>
+        <item id="1">First Item</item>
+        <item id="2">Second Item</item>
+    </nested_structure>
+    <empty_element/>
+</root>
+)";
+
 SXMLEntity root_begin = {
     .DType = SXMLEntity::EType::StartElement,
     .DNameData = "root",
@@ -362,6 +381,18 @@ TEST(XMLReader, ReferenceSkipcdata) {
 
     // EXPECT_EQ(mismatch_from_reference.in1, entities.end()); // basically this
     // means no mismatch
+}
+
+TEST(XMLReader, Malformed) {
+    auto Source = std::make_shared<CStringDataSource>(malformed_xml);
+
+    CXMLReader Reader(Source);
+
+    SXMLEntity entity;
+    while(Reader.ReadEntity(entity)) {}
+
+    EXPECT_FALSE(Reader.ReadEntity(entity));
+    EXPECT_FALSE(Reader.End());
 }
 
 TEST(XMLWriter, WholeDocument) {
