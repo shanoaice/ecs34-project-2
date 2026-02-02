@@ -326,9 +326,8 @@ TEST(XMLReader, Reference) {
   CXMLReader Reader(Source);
 
   std::vector<SXMLEntity> entities;
-  while (!Reader.End()) {
-    SXMLEntity entity;
-    Reader.ReadEntity(entity);
+  SXMLEntity entity;
+  while (Reader.ReadEntity(entity)) {
     entities.push_back(entity);
   }
 
@@ -349,9 +348,8 @@ TEST(XMLReader, ReferenceSkipcdata) {
   CXMLReader Reader(Source);
 
   std::vector<SXMLEntity> entities;
-  while (!Reader.End()) {
-    SXMLEntity entity;
-    Reader.ReadEntity(entity, true);
+  SXMLEntity entity;
+  while (Reader.ReadEntity(entity)) {
     entities.push_back(entity);
   }
 
@@ -378,14 +376,10 @@ TEST(XMLWriter, WholeDocument) {
   CXMLReader Reader(Source);
 
   std::vector<SXMLEntity> entities;
-  while (!Reader.End()) {
-    SXMLEntity entity;
-    Reader.ReadEntity(entity);
+  SXMLEntity entity;
+  while (Reader.ReadEntity(entity)) {
     entities.push_back(entity);
   }
-
-  SXMLEntity entity;
-  EXPECT_FALSE(Reader.ReadEntity(entity));
 
   EXPECT_EQ(entities.size(), reference_reader.size());
 
@@ -431,9 +425,8 @@ TEST(XMLWriter, FlushTags) {
   CXMLReader Reader(Source);
 
   std::vector<SXMLEntity> entities;
-  while (!Reader.End()) {
-    SXMLEntity entity;
-    Reader.ReadEntity(entity);
+  SXMLEntity entity;
+  while (Reader.ReadEntity(entity)) {
     entities.push_back(entity);
   }
 
@@ -464,7 +457,7 @@ TEST(XMLWriter, RejectMalformedEntities) {
   };
 
   SXMLEntity malformed_entity_type = {
-      .DType = (SXMLEntity::EType) 4,
+      .DType = (SXMLEntity::EType)4,
       .DNameData = "malformed",
       .DAttributes = {},
   };
