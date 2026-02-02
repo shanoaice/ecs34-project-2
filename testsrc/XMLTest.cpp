@@ -474,3 +474,24 @@ TEST(XMLWriter, RejectMalformedEntities) {
   EXPECT_FALSE(Writer.WriteEntity(malformed_complete_entity));
   EXPECT_FALSE(Writer.WriteEntity(malformed_entity_type));
 }
+
+TEST(XMLWriter, RejectMismatchedTags) {
+  auto Sink = std::make_shared<CStringDataSink>();
+  CXMLWriter Writer(Sink);
+
+  SXMLEntity mismatched_begin_entity = {
+      .DType = SXMLEntity::EType::StartElement,
+      .DNameData = "mismatched",
+      .DAttributes = {},
+  };
+
+  SXMLEntity mismatched_end_entity = {
+      .DType = SXMLEntity::EType::EndElement,
+      .DNameData = "mismatch",
+      .DAttributes = {},
+  };
+
+  Writer.WriteEntity(mismatched_begin_entity);
+
+  EXPECT_FALSE(Writer.WriteEntity(mismatched_end_entity));
+}
