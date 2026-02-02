@@ -4,9 +4,9 @@
     <special_characters>
         <less_than>&lt;</less_than>
         <greater_than>&gt;</greater_than>
-        <ampersand>&amp;</ampersand>
-        <apostrophe>&apos;</apostrophe>
-        <quote>&quot;</quote>
+        <ampersand tag="&amp;">&amp;</ampersand>
+        <apostrophe tag="&apos;">'</apostrophe>
+        <quote tag="&quot;">"</quote>
     </special_characters>
     <nested_structure>
         <item id="1">First Item</item>
