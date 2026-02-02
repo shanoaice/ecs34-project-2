@@ -99,3 +99,7 @@ TEST(StringUtilsTest, EditDistance) {
   EXPECT_EQ(StringUtils::EditDistance("DIST", "DEXT"), 2);
   EXPECT_EQ(StringUtils::EditDistance("DIST", "dext", true), 2);
 }
+
+TEST(StringUtilsTest, IsAllWhiteSpace) {
+  EXPECT_TRUE(StringUtils::IsAllWhiteSpace(" "));
+}
