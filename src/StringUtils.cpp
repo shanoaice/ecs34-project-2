@@ -1,4 +1,5 @@
 #include "StringUtils.h"
+#include <algorithm>
 #include <ranges>
 #include <string>
 #include <string_view>
@@ -134,7 +135,12 @@ int EditDistanceRec(const std::string &left,
 
 int EditDistance(const std::string &left, const std::string &right,
                  bool ignorecase) noexcept {
-  return EditDistanceRec(ignorecase ? Upper(left) : left, ignorecase ? Upper(right) : right);
+  return EditDistanceRec(ignorecase ? Upper(left) : left,
+                         ignorecase ? Upper(right) : right);
 }
 
-};
+bool IsAllWhiteSpace(const std::string &s) noexcept {
+  return std::ranges::all_of(s, [](char c) { return std::isspace(c); });
+}
+
+}; // namespace StringUtils
