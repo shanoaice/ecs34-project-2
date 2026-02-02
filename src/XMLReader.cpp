@@ -1,4 +1,5 @@
 #include "XMLReader.h"
+#include "StringUtils.h"
 #include <expat.h>
 #include <queue>
 
@@ -33,13 +34,15 @@ struct CXMLReader::SImplementation{
         This->DQueue.push(NewEntity);
     }
 
-    static void CharacterDataHandler(void *userData, const XML_Char *s, int len){
+    static void CharacterDataHandler(void *userData, const XML_Char *cdata, int len){
         SImplementation *This = (SImplementation *)userData;
         SXMLEntity NewEntity;
 
         NewEntity.DType = SXMLEntity::EType::CharData;
-        NewEntity.DNameData = std::string(s,len);
+        NewEntity.DNameData = std::string(cdata,len);
+        if (!StringUtils::IsAllWhiteSpace(NewEntity.DNameData)) {
         This->DQueue.push(NewEntity);
+        }
     }
 
     SImplementation(std::shared_ptr< CDataSource > src){
