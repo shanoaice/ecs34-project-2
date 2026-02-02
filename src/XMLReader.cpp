@@ -9,6 +9,8 @@ struct CXMLReader::SImplementation{
     std::shared_ptr< CDataSource > DSource;
     XML_Parser DParser;
     std::queue<SXMLEntity> DQueue;
+    std::vector<char> DBuffer;
+    const size_t DBufferSize = 512;
 
     bool DDone = false;
     bool DParseError = false;
@@ -41,7 +43,7 @@ struct CXMLReader::SImplementation{
         NewEntity.DType = SXMLEntity::EType::CharData;
         NewEntity.DNameData = std::string(cdata,len);
         if (!StringUtils::IsAllWhiteSpace(NewEntity.DNameData)) {
-        This->DQueue.push(NewEntity);
+          This->DQueue.push(NewEntity);
         }
     }
 
@@ -68,15 +70,14 @@ struct CXMLReader::SImplementation{
             return false;
         }
 
-        std::vector<char> Buffer(512);
-        DSource->Read(Buffer, Buffer.size());
+        DSource->Read(DBuffer, DBufferSize);
 
         const bool IsFinal = DSource->End();
 
-        const int Len = static_cast<int>(Buffer.size());
+        const int Len = static_cast<int>(DBuffer.size());
         const int Status = XML_Parse(
             DParser,
-            Buffer.empty() ? "" : Buffer.data(),
+            DBuffer.empty() ? "" : DBuffer.data(),
             Len,
             IsFinal ? 1 : 0
         );
@@ -112,7 +113,7 @@ struct CXMLReader::SImplementation{
             }
 
             if(!OneTimePump()){
-                    return false;
+                return false;
             }
         }
 
