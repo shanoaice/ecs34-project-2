@@ -98,13 +98,17 @@ struct CXMLReader::SImplementation {
                 }
             }
 
+            if (DParseError) {
+                return false;
+            }
+
             if (!DQueue.empty()) {
                 entity = DQueue.front();
                 DQueue.pop();
                 return true;
             }
 
-            if (End() || DParseError) {
+            if (End()) {
                 return false;
             }
 
